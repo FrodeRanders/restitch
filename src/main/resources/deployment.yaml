@@ -1,0 +1,28 @@
+# MSF4J configuration
+wso2.msf4j.configuration:
+  # No of worker pool threads to handle MSF4J requests
+  threadCount: 100
+  threadPoolName: msf4j.executor.workerpool
+
+wso2.metrics:
+  enabled: true
+
+  jmx:
+    registerMBean: true
+    name: org.wso2.msf4j:type=Metrics
+
+  reporting:
+    jmx:
+      - name: JMX
+        enabled: true
+
+#    console:
+#      - name: Console
+#        enabled: true
+#        pollingPeriod: 30
+
+    slf4j:
+      - name: SLF4J
+        enabled: true
+        loggerName: metrics
+        pollingPeriod: 120
