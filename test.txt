@@ -1,0 +1,31 @@
+➜ curl http://localhost:8080/process/775113c6-8f7a-4f0d-b5fd-9139727ef227
+
+➜ curl -v -H "Content-Type:application/json" -d '{"pizzaId":101,"ingredients":["flour","eggs","milk","salt","small nasty chickins"],"pizzaName":"Chichen (P)itza"}' http://localhost:8080/process/demo/775113c6-8f7a-4f0d-b5fd-9139727ef227
+
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> POST /invoke/775113c6-8f7a-4f0d-b5fd-9139727ef227 HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.58.0
+> Accept: */*
+> Content-Type:application/json
+> Content-Length: 100
+> 
+* upload completely sent off: 100 out of 100 bytes
+< HTTP/1.1 200 OK
+< Host: localhost:8080
+< User-Agent: curl/7.58.0
+< Accept: */*
+< Connection: keep-alive
+< Content-Length: 10
+< Content-Type: application/json
+< 
+* Connection #0 to host localhost left intact
+["Yummy!"]%
+
+➜ curl http://localhost:8080/process/775113c6-8f7a-4f0d-b5fd-9139727ef227
+
+["Yummy!"]%
+
+➜  

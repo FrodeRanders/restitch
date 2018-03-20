@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>A generic microprocess that orchestrates calls to a configurable set of backing REST services</description>
+    <description>A generic micro-process that orchestrates calls to a configurable set of backing REST services</description>
     <url>http://github.com/FrodeRanders/restitch</url>
 
     <licenses>
@@ -38,7 +38,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<microservice.mainClass>org.gautelis.restitch.Application</microservice.mainClass>-->
 
         <httpclient.version>4.5.5</httpclient.version>
         <slf4j.version>1.7.25</slf4j.version>
@@ -130,13 +129,6 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

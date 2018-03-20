@@ -41,5 +41,5 @@
 
     <!--The process manager should not make any assumptions about the
         data flowing through a process (other than it being JSON) -->
-    <entry key="assume-native-process-data-flow">true</entry>
+    <entry key="assume-native-process-data-flow">false</entry>
 </properties>

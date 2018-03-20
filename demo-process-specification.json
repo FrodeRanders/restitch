@@ -1,0 +1,30 @@
+{
+  "processes": {
+    "demo": [
+      {
+        "invocationURI": "http://localhost:8080/invoke-stub",
+        "compensationURI": "http://localhost:8080/compensate-stub"
+      },
+      {
+        "invocationURI": "http://localhost:8080/invoke-stub",
+        "compensationURI": "http://localhost:8080/compensate-stub"
+      },
+      {
+        "invocationURI": "http://localhost:8080/invoke-stub"
+      }
+    ],
+    "extra": [
+      {
+        "invocationURI": "http://localhost:8080/invoke-stub",
+        "compensationURI": "http://localhost:8080/compensate-stub"
+      },
+      {
+        "invocationURI": "http://localhost:8080/invoke-stub",
+        "compensationURI": "http://localhost:8080/compensate-stub"
+      },
+      {
+        "invocationURI": "http://localhost:8080/invoke-stub"
+      }
+    ]
+  }
+}
