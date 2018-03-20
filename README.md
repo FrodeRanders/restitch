@@ -7,10 +7,10 @@ A generic microprocess that orchestrates calls to a configurable set of backing 
 
 Client issues a process invocation:
 ```
-➜ curl -v -H "Content-Type:application/json" -d '{"pizzaId":101,"ingredients":["flour","eggs","milk","salt","kittens"],"pizzaName":"Chichen (P)itza"}' http://localhost:8080/invoke/775113c6-8f7a-4f0d-b5fd-9139727ef224
+➜ curl -v -H "Content-Type:application/json" -d '{"pizzaId":101,"ingredients":["flour","eggs","milk","salt","kittens"],"pizzaName":"Chichen (P)itza"}' http://localhost:8080/process/demo/775113c6-8f7a-4f0d-b5fd-9139727ef224
 ```
 
-which is greeted with the following result
+which is greeted with something akin to:
 ```
 *   Trying ::1...
 * TCP_NODELAY set
@@ -37,7 +37,7 @@ which is greeted with the following result
 
 Client can later (until process is dropped), pull the process result:
 ```
-➜ curl -v http://localhost:8080/invoke/775113c6-8f7a-4f0d-b5fd-9139727ef224
+➜ curl -v http://localhost:8080/process/775113c6-8f7a-4f0d-b5fd-9139727ef224
 ```
 
 which is greeted with the following result
@@ -64,7 +64,7 @@ which is greeted with the following result
 
 After the process was dropped:
 ```
-➜ curl -v http://localhost:8080/invoke/775113c6-8f7a-4f0d-b5fd-9139727ef224
+➜ curl -v http://localhost:8080/process/775113c6-8f7a-4f0d-b5fd-9139727ef224
 
 *   Trying ::1...
 * TCP_NODELAY set
@@ -83,3 +83,4 @@ After the process was dropped:
 < 
 * Connection #0 to host localhost left intact
 ```
+
