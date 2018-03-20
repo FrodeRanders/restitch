@@ -59,6 +59,7 @@ public class AbandonedProcessService {
      */
     @GET
     @Timed
+    @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     @ApiOperation(
             value = "Return list of abandoned processes' details, identified by correlation ID",
@@ -66,9 +67,7 @@ public class AbandonedProcessService {
     @ApiResponses(value = {
             @ApiResponse(code = 200 /* OK */, message = "OK"),
             @ApiResponse(code = 598 /* Request failure */, message = "Failed to process request")})
-    public Response getAbandonedProcesses(
-            @ApiParam(value = "CorrelationId", required = true) @PathParam("correlationId") String correlationId
-    ) {
+    public Response getAbandonedProcesses() {
         try {
             Collection<MuProcessDetails> details = manager.salvageAbandonedProcesses();
             return Response.ok(details, MediaType.APPLICATION_JSON_TYPE).build();
