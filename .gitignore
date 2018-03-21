@@ -3,6 +3,7 @@
 .idea/
 temporary-db/
 target/
+deployment.yaml
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
