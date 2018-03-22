@@ -22,6 +22,7 @@ import org.gautelis.muprocessmanager.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.annotation.Timed;
+import org.wso2.msf4j.analytics.httpmonitoring.HTTPMonitored;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

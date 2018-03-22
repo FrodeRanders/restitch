@@ -79,7 +79,7 @@ public class StubbedCompensationService {
             @ApiResponse(code = 200 /* OK */, message = "OK"),
             @ApiResponse(code = 598 /* Process failure */, message = "Failed to process request")})
     public Response fetchPreState(
-            @ApiParam(value = "Parameters", required = true) @Context Request parameters
+            @ApiParam(value = "ActionParameters", required = true) @Context Request parameters
     ) {
         String payload;
         try (InputStream is = parameters.getMessageContentStream()) {

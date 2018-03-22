@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.annotation.Timed;
 import org.wso2.msf4j.Request;
+import org.wso2.msf4j.analytics.httpmonitoring.HTTPMonitored;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -86,7 +87,7 @@ public class ProcessService {
     public Response invokeProcess(
             @ApiParam(value = "ProcessMoniker", required = true) @PathParam("processMoniker") String processMoniker,
             @ApiParam(value = "CorrelationId", required = true) @PathParam("correlationId") String correlationId,
-            @ApiParam(value = "Parameters", required = true) @Context Request parameters
+            @ApiParam(value = "ActionParameters", required = true) @Context Request parameters
     ) {
         String payload;
         try (InputStream is = parameters.getMessageContentStream()) {

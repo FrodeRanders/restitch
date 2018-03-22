@@ -26,6 +26,7 @@ import org.gautelis.restitch.stubbed.StubbedCompensationService;
 import org.gautelis.restitch.stubbed.StubbedInvocationService;
 import org.gautelis.vopn.lang.*;
 import org.wso2.msf4j.MicroservicesRunner;
+import org.wso2.msf4j.analytics.httpmonitoring.HTTPMonitoringInterceptor;
 import org.wso2.msf4j.analytics.metrics.MetricsInterceptor;
 
 import javax.sql.DataSource;
@@ -133,8 +134,10 @@ public class Application {
         manager.start();
 
         try {
+            MetricsInterceptor metricsInterceptor = new MetricsInterceptor();
             new MicroservicesRunner()
-                    .addInterceptor(new MetricsInterceptor())
+                    .addGlobalRequestInterceptor(metricsInterceptor)
+                    .addGlobalResponseInterceptor(metricsInterceptor)
                     .deploy(new ProcessService(manager, configuration))
                     .deploy(new AbandonedProcessService(manager))
                     // Non-important stuff

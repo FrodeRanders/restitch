@@ -77,7 +77,7 @@ public class StubbedInvocationService {
             @ApiResponse(code = 200 /* OK */, message = "OK"),
             @ApiResponse(code = 500 /* Internal Server Error */, message = "Failed to process request")})
     public Response invoke(
-            @ApiParam(value = "Parameters", required = true) @Context Request parameters
+            @ApiParam(value = "ActionParameters", required = true) @Context Request parameters
     ) {
         String payload;
         try (InputStream is = parameters.getMessageContentStream()) {
