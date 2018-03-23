@@ -78,7 +78,7 @@ public class StubbedCompensationService {
     @ApiResponses(value = {
             @ApiResponse(code = 200 /* OK */, message = "OK"),
             @ApiResponse(code = 598 /* Process failure */, message = "Failed to process request")})
-    public Response fetchPreState(
+    public Response compensate(
             @ApiParam(value = "ActionParameters", required = true) @Context Request parameters
     ) {
         String payload;

@@ -112,6 +112,18 @@
             <version>1.5.18</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>1.5.18</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.msf4j</groupId>
+            <artifactId>msf4j-swagger</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+
         <!-- Logging (simple log facade over log4j2) -->
         <dependency>
             <groupId>org.slf4j</groupId>
