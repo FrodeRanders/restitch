@@ -17,7 +17,6 @@
  */
 package org.gautelis.restitch;
 
-import org.bouncycastle.asn1.cmp.POPODecKeyRespContent;
 import org.gautelis.muprocessmanager.MuProcessException;
 import org.gautelis.muprocessmanager.MuProcessManagementPolicy;
 import org.gautelis.muprocessmanager.MuProcessManager;
@@ -31,11 +30,9 @@ import org.gautelis.vopn.db.utils.MySQL;
 import org.gautelis.vopn.db.utils.PostgreSQL;
 import org.gautelis.vopn.lang.*;
 import org.wso2.msf4j.MicroservicesRunner;
-import org.wso2.msf4j.analytics.httpmonitoring.HTTPMonitoringInterceptor;
 import org.wso2.msf4j.analytics.metrics.MetricsInterceptor;
 
 import javax.sql.DataSource;
-import javax.ws.rs.POST;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
