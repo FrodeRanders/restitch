@@ -64,13 +64,13 @@ public class AbandonedProcessService {
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     @ApiOperation(
             value = "Return list of abandoned processes' details, identified by correlation ID",
-            notes = "Contains details about ultimately failing processes")
+            notes = "Contains details about failed processes having activities that could not be compensated")
     @ApiResponses(value = {
             @ApiResponse(code = 200 /* OK */, message = "OK"),
             @ApiResponse(code = 598 /* Request failure */, message = "Failed to process request")})
     public Response getAbandonedProcesses() {
         try {
-            Collection<MuProcessDetails> details = manager.salvageAbandonedProcesses();
+            Collection<MuProcessDetails> details = manager.getAbandonedProcessesDetails();
             return Response.ok(details, MediaType.APPLICATION_JSON_TYPE).build();
 
         } catch (MuProcessException mpe) {

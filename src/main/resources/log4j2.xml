@@ -34,7 +34,7 @@
 
     <Loggers>
         <logger name="org.gautelis.vopn.lang" level="INFO" />
-        <logger name="org.gautelis.muprocessmanager" level="TRACE" />
+        <logger name="org.gautelis.muprocessmanager" level="DEBUG" />
         <logger name="org.gautelis.restitch" level="TRACE" />
         <logger name="org.wso2.msf4j" level="TRACE" />
         <logger name="org.apache" level="WARN" />

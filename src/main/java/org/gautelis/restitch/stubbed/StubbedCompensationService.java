@@ -41,7 +41,7 @@ import java.nio.charset.StandardCharsets;
 @SwaggerDefinition(
         info = @Info(
                 title = "Restitch Stubbed Compensator Swagger Definition", version = "1.0",
-                description = "Stubbed process activity service",
+                description = "Stubbed process activity service, suitable for testing purposes",
                 license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0"),
                 contact = @Contact(
                         name = "Frode Randers",
@@ -91,7 +91,7 @@ public class StubbedCompensationService {
             return Response.status(500).type(MediaType.TEXT_PLAIN_TYPE).entity(info).build();
         }
 
-        System.out.println("STUBBED compensation " + (++counter));
+        System.out.println("STUBBED compensation " + (++counter) + " (got " + payload.getBytes().length + " bytes)");
 
         if (!(Math.random() < backwardFailureProbability)) {
             return Response.ok().build();

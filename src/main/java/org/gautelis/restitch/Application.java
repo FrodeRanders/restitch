@@ -17,6 +17,7 @@
  */
 package org.gautelis.restitch;
 
+import org.bouncycastle.asn1.cmp.POPODecKeyRespContent;
 import org.gautelis.muprocessmanager.MuProcessException;
 import org.gautelis.muprocessmanager.MuProcessManagementPolicy;
 import org.gautelis.muprocessmanager.MuProcessManager;
@@ -24,14 +25,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gautelis.restitch.stubbed.StubbedCompensationService;
 import org.gautelis.restitch.stubbed.StubbedInvocationService;
+import org.gautelis.vopn.db.Database;
+import org.gautelis.vopn.db.DatabaseException;
+import org.gautelis.vopn.db.utils.MySQL;
+import org.gautelis.vopn.db.utils.PostgreSQL;
 import org.gautelis.vopn.lang.*;
 import org.wso2.msf4j.MicroservicesRunner;
 import org.wso2.msf4j.analytics.httpmonitoring.HTTPMonitoringInterceptor;
 import org.wso2.msf4j.analytics.metrics.MetricsInterceptor;
 
 import javax.sql.DataSource;
+import javax.ws.rs.POST;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 
@@ -41,82 +49,76 @@ public class Application {
     private final static Logger log = LogManager.getLogger(Application.class);
 
     private static final String PROCESS_SPECIFICATION_FILE = "RESTITCH_PROCESS_SPECIFICATION_FILE";
+    private static final String MANAGEMENT_POLICY_FILE = "RESTITCH_MANAGEMENT_POLICY_FILE";
+    private static final String SQL_STATEMENTS_FILE = "RESTITCH_SQL_STATEMENTS_FILE";
+
     public interface Configuration {
-        @Configurable(property=PROCESS_SPECIFICATION_FILE)
+        @Configurable(property = PROCESS_SPECIFICATION_FILE)
         File processSpecification();
+
+        @Configurable(property = MANAGEMENT_POLICY_FILE)
+        File managementPolicy();
+
+        @Configurable(property = SQL_STATEMENTS_FILE)
+        File sqlStatements();
     }
 
     public static void main( String... args ) {
-        String configFileName = System.getenv(PROCESS_SPECIFICATION_FILE);
-        if (null == configFileName || configFileName.length() == 0) {
-            String info = "Need configuration file name, configured among environment variables as \"" + PROCESS_SPECIFICATION_FILE+ "\"";
-            System.err.println(info);
-            System.err.println("The contents of this file could be something like:");
-            System.err.println("---8<------------------------------------------------------------------------------------");
-            System.err.println(ProcessSpecification.getExample());
-            System.err.println("------------------------------------------------------------------------------------>8---");
-            System.exit(1);
-        }
-
+        // Setup configuration
         Collection<ConfigurationTool.ConfigurationResolver> resolvers = new ArrayList<>();
-
-        // <<<"Check among system environment">>>-resolver
         resolvers.add(new SystemEnvironmentConfigurationResolver());
 
-        /*
-        // <<<"Check among bundled resources">>>-resolver
-        try {
-            resolvers.add(new BundledPropertiesConfigurationResolver(Application.class, "default-process-specification"));
-        }
-        catch (IOException ioe) {
-            String info = "Failed to load bundled default process specification: " + ioe.getMessage();
+        Map<String, String> defaults = new HashMap<>();
+        Configuration configuration = ConfigurationTool.bind(Configuration.class, defaults, resolvers);
+
+        // Load process specification
+        File specFile = configuration.processSpecification();
+        if (null == specFile || !specFile.exists() || !specFile.canRead()) {
+            String info = "Need process specification file name, configured among environment variables as \"" + PROCESS_SPECIFICATION_FILE+ "\"";
             System.err.println(info);
+            System.err.println("The contents of this file could be something like:");
+            System.err.println("---8<---------------------------------------------------------------------------");
+            System.err.println(ProcessSpecification.getExample());
+            System.err.println("--------------------------------------------------------------------------->8---");
             System.exit(1);
         }
-        */
 
-        Map<String, Object> noDefaults = new HashMap<>();
-        Configuration configuration = ConfigurationTool.bind(Configuration.class, noDefaults, resolvers);
-
-        // Load default database configuration and initiate
-        DataSource dataSource;
-        try {
-            dataSource = MuProcessManager.getDefaultDataSource("restitch");
-            MuProcessManager.prepareInternalDatabase(dataSource);
-        }
-        catch (MuProcessException mpe) {
-            String info = "Failed to establish datasource: ";
-            info += mpe.getMessage();
-            log.warn(info, mpe);
-
-            System.err.println(info);
-            System.exit(1);
-            return;
-        }
-
-        // Load default (internal) SQL statements
+        // Load SQL statements
         Properties sqlStatements;
         try {
-            sqlStatements = MuProcessManager.getDefaultSqlStatements();
+            File statementsFile = configuration.sqlStatements();
+            if (null == statementsFile || !statementsFile.exists() || !statementsFile.canRead()) {
+                System.out.println("Using default SQL statements");
+                sqlStatements = MuProcessManager.getDefaultSqlStatements();
+            } else {
+                sqlStatements = MuProcessManager.getSqlStatements(statementsFile);
+            }
         }
-        catch (MuProcessException mpe) {
+        catch (FileNotFoundException | MuProcessException e) {
             String info = "Failed to load SQL statements: ";
-            info += mpe.getMessage();
-            log.warn(info, mpe);
+            info += e.getMessage();
+            log.warn(info, e);
 
             System.err.println(info);
             System.exit(1);
             return;
         }
 
+        // Load process management policy
         MuProcessManagementPolicy policy;
         try {
-            policy = MuProcessManager.getManagmentPolicy(Application.class,"management-policy.xml");
+            File policyFile = configuration.managementPolicy();
+            if (null == policyFile || !policyFile.exists() || !policyFile.canRead()) {
+                System.out.println("Using default management policy");
+                policy = MuProcessManager.getManagementPolicy(Application.class, "management-policy.xml");
+            } else {
+                policy = MuProcessManager.getManagementPolicy(policyFile);
+            }
         }
-        catch (MuProcessException mpe) {
+        catch (FileNotFoundException | MuProcessException e) {
             String info = "Failed to load process management policy: ";
-            info += mpe.getMessage();
-            log.warn(info, mpe);
+            info += e.getMessage();
+            log.warn(info, e);
 
             System.err.println(info);
             System.exit(1);
@@ -129,8 +131,10 @@ public class Application {
             System.exit(1);
         }
 
+        //
+        DataSource dataSource = getDataSource();
         MuProcessManager manager = MuProcessManager.getManager(dataSource, sqlStatements, policy);
-        getRuntime().addShutdownHook(new Thread(() -> manager.stop()));
+        getRuntime().addShutdownHook(new Thread(manager::stop));
         manager.start();
 
         try {
@@ -159,6 +163,118 @@ public class Application {
             System.err.println(info);
             t.printStackTrace(System.err);
             System.exit(1);
+        }
+    }
+
+    /**
+     * Determines what database to use, based on some heuristics; we prefer PostgreSQL ahead of MySQL,
+     * falling back on an embedded Derby database.
+     * @return
+     */
+    private static DataSource getDataSource() {
+        DataSource dataSource = null;
+
+        try {
+            // 1. Check whether PostgreSQL is chosen (first)
+            String choice = System.getenv("POSTGRESQL_DATABASE");
+            if (null == choice || choice.isEmpty()) {
+
+                // 2. Check whether MySQL is chosen (second)
+                choice = System.getenv("MYSQL_DATABASE");
+                if (null == choice || choice.isEmpty()) {
+                    // No database configuration -- fall back on embedded derby
+                    System.out.println("Using default backing database");
+                    dataSource = MuProcessManager.getDefaultDataSource("restitch");
+                    MuProcessManager.prepareInternalDatabase(dataSource);
+
+                } else {
+                    // MySQL was chosen
+                    System.out.println("Using MySQL as backing database");
+                    Properties properties = loadProperties(
+                            "mysql", 3306,
+                            (host, port, database, user, password, props) -> {
+                        String url = String.format(
+                                "jdbc:mysql://%s:%d/%s?useSSL=false&amp;serverTimezone=UTC",
+                                host, port, database
+                        );
+                        props.setProperty("url", url);
+                    });
+                    dataSource = MySQL.getDataSource("restitch", Database.getConfiguration(properties));
+                }
+            } else {
+                // PostgreSQL
+                System.out.println("Using PostgreSQL as backing database");
+                Properties properties = loadProperties(
+                        "postgresql", 5433,
+                        (host, port, database, user, password, props) -> {
+                    String url = String.format(
+                            "jdbc:postgresql://%s:%d/%s",
+                            host, port, database
+                    );
+                    props.setProperty("url", url);
+                });
+                dataSource = PostgreSQL.getDataSource("restitch", Database.getConfiguration(properties));
+            }
+        }
+        catch (DatabaseException | MuProcessException | IOException e) {
+            String info = "Failed to establish datasource: ";
+            info += e.getMessage();
+            log.warn(info, e);
+
+            System.err.println(info);
+            System.exit(1);
+        }
+        return dataSource;
+    }
+
+    public interface DatabaseDetailsRunnable {
+        void run(String host, int port, String database, String user, String password, Properties properties);
+    }
+
+
+    private static Properties loadProperties(String moniker, int defaultPort, DatabaseDetailsRunnable runnable) throws IOException {
+        try (InputStream is = Application.class.getResourceAsStream(moniker.toLowerCase() + "-configuration.xml")) {
+            Properties properties = new Properties();
+            properties.loadFromXML(is);
+
+            // host
+            String host = System.getenv(moniker.toUpperCase() + "_SERVICE_HOST");
+            if (null == host || host.isEmpty()) {
+                host = moniker.toLowerCase();
+            }
+
+            // port
+            int port;
+            String _port = System.getenv(moniker.toUpperCase() + "_SERVICE_PORT");
+            if (null == _port || _port.isEmpty()) {
+                port = defaultPort;
+            } else {
+                port = Integer.parseInt(_port);
+            }
+
+            // database
+            String database = System.getenv(moniker.toUpperCase() + "_DATABASE_NAME");
+            if (null == database || database.isEmpty()) {
+                database = "restitch";
+            }
+
+            // user
+            String user = System.getenv(moniker.toUpperCase() + "_USER");
+            if (null == user || user.isEmpty()) {
+                user = "restitch";
+            }
+            properties.setProperty("user", user);
+
+            // password
+            String password = System.getenv(moniker.toUpperCase() + "_PASSWORD");
+            if (null == password || password.isEmpty()) {
+                password = "restitch";
+            }
+            properties.setProperty("password", password);
+
+            //
+            runnable.run(host, port, database, user, password, properties);
+            return properties;
         }
     }
 }

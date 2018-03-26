@@ -16,11 +16,6 @@ wso2.metrics:
       - name: JMX
         enabled: true
 
-#    console:
-#      - name: Console
-#        enabled: true
-#        pollingPeriod: 30
-
     slf4j:
       - name: SLF4J
         enabled: true
