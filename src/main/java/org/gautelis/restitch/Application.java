@@ -61,6 +61,7 @@ public class Application {
     }
 
     public static void main( String... args ) {
+
         // Setup configuration
         Collection<ConfigurationTool.ConfigurationResolver> resolvers = new ArrayList<>();
         resolvers.add(new SystemEnvironmentConfigurationResolver());

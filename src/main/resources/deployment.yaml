@@ -1,6 +1,4 @@
-# MSF4J configuration
 wso2.msf4j.configuration:
-  # No of worker pool threads to handle MSF4J requests
   threadCount: 100
   threadPoolName: msf4j.executor.workerpool
 

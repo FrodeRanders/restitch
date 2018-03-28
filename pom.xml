@@ -148,6 +148,12 @@
             <artifactId>log4j-jcl</artifactId>
             <version>${log4j.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
+            <version>1.11.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -188,6 +194,19 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+
+                                        <exclude>log4j.properties</exclude>
+                                        <exclude>Log4j-*.properties</exclude>
+                                        <exclude>Log4j-*.xsd</exclude>
+                                        <exclude>Log4j-*.dtd</exclude>
+
+                                        <exclude>org/apache/commons/logging</exclude>
+
+                                        <exclude>javax/annotation</exclude>
+                                        <exclude>javax/validation</exclude>
+                                        <exclude>javax/websocket</exclude>
+                                        <exclude>javax/ws</exclude>
+                                        <exclude>META-INF/services/org.apache.commons.logging.LogFactory</exclude>
                                     </excludes>
                                 </filter>
                              </filters>
