@@ -65,8 +65,8 @@
 
     <Loggers>
         <Logger name="org.gautelis.vopn.lang" level="INFO" />
-        <Logger name="org.gautelis.muprocessmanager" level="DEBUG" />
-        <Logger name="org.gautelis.restitch" level="DEBUG" />
+        <Logger name="org.gautelis.muprocessmanager" level="INFO" />
+        <Logger name="org.gautelis.restitch" level="INFO" />
 
         <Logger name="org.wso2" level="INFO" />
         <Logger name="io.netty" level="INFO" />

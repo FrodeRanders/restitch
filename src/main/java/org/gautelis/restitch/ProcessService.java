@@ -284,5 +284,57 @@ public class ProcessService {
             return Response.status(500).type(MediaType.TEXT_PLAIN_TYPE).entity(info).build();
         }
     }
+
+    /**
+     * Retrieve process specifications.
+     * <p>
+     * curl http://localhost:8080/process
+     * <p>
+     *
+     * @return ProcessSpecification
+     */
+    @GET
+    @Timed
+    @Path("/")
+    @Produces({MediaType.APPLICATION_JSON})
+    @ApiOperation(
+            value = "Return all process specifications",
+            notes = "Return all process specifications")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200 /* OK */, message = "Valid request")})
+    public ProcessSpecification getProcessSpecifications() {
+        return specification;
+    }
+
+    /**
+     * Retrieve process specifications.
+     * <p>
+     * curl http://localhost:8080/process
+     * <p>
+     *
+     * @return ProcessSpecification
+     */
+    @GET
+    @Timed
+    @Path("/{processMoniker}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Return named process specification",
+            notes = "Return named process specification")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    @ApiResponses(value = {
+            @ApiResponse(code = 200 /* OK */, message = "Valid request"),
+            @ApiResponse(code = 412 /* Precondition Failed */, message = "Unknown process specification")})
+    public Response getProcessSpecification(
+            @ApiParam(value = "ProcessMoniker", required = true) @PathParam("processMoniker") String processMoniker
+    ) {
+        Optional<List<ProcessSpecification.Specification>> specificationList = specification.getSpecification(processMoniker);
+        if (!specificationList.isPresent()) {
+            String info = "Unknown process: " + processMoniker;
+            return Response.status(412).type(MediaType.TEXT_PLAIN_TYPE).entity(info).build();
+        }
+        List<ProcessSpecification.Specification> specification = specificationList.get();
+        return Response.ok().type(MediaType.APPLICATION_JSON_TYPE).entity(specification).build();
+    }
 }
 

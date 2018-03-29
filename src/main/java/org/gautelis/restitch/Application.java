@@ -141,6 +141,7 @@ public class Application {
                     .addGlobalRequestInterceptor(metricsInterceptor)
                     .addGlobalResponseInterceptor(metricsInterceptor)
                     .deploy(new ProcessService(manager, configuration))
+                    .deploy(new StatusProcessService(manager))
                     .deploy(new AbandonedProcessService(manager))
                     // Non-important stuff
                     .deploy(new StubbedInvocationService())

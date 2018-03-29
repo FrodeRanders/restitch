@@ -55,6 +55,16 @@ public class StubbedInvocationService {
     private static long counter = 0L;
     private static final double forwardFailureProbability = 0.10;
 
+    public class SomeKindOfResult {
+        String key;
+        String value;
+
+        SomeKindOfResult(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
     public StubbedInvocationService() {
     }
 
@@ -92,8 +102,8 @@ public class StubbedInvocationService {
         System.out.println("STUBBED invocation " + (++counter) + " (got " + payload.getBytes().length + " bytes)");
 
         if (!(Math.random() < forwardFailureProbability)) {
-            String json = ProcessSpecification.getExample();
-            return Response.ok(json, MediaType.APPLICATION_JSON_TYPE).build();
+            SomeKindOfResult result = new SomeKindOfResult("Key-" + counter, "Value associated with Key-" + counter);
+            return Response.ok(result, MediaType.APPLICATION_JSON_TYPE).build();
         }
         else {
             String info = "Simulated invocation failure";

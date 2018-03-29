@@ -18,11 +18,12 @@
 package org.gautelis.restitch;
 
 import io.swagger.annotations.*;
-import org.gautelis.muprocessmanager.*;
+import org.gautelis.muprocessmanager.MuProcessDetails;
+import org.gautelis.muprocessmanager.MuProcessException;
+import org.gautelis.muprocessmanager.MuProcessManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.annotation.Timed;
-import org.wso2.msf4j.analytics.httpmonitoring.HTTPMonitored;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -30,11 +31,11 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Optional;
 
-@Api(value = "abandoned")
+@Api(value = "status")
 @SwaggerDefinition(
         info = @Info(
-                title = "Restitch Abandoned Swagger Definition", version = "1.0",
-                description = "Abandoned processes service",
+                title = "Restitch Status Swagger Definition", version = "1.0",
+                description = "Process status service",
                 license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0"),
                 contact = @Contact(
                         name = "Frode Randers",
@@ -42,39 +43,39 @@ import java.util.Optional;
                         url = "http://github.com/FrodeRanders/restitch"
                 ))
 )
-@Path("/abandoned")
-public class AbandonedProcessService {
-    private static final Logger log = LoggerFactory.getLogger(AbandonedProcessService.class);
+@Path("/status")
+public class StatusProcessService {
+    private static final Logger log = LoggerFactory.getLogger(StatusProcessService.class);
 
     private final MuProcessManager manager;
 
-    /* package private */ AbandonedProcessService(MuProcessManager manager) {
+    /* package private */ StatusProcessService(MuProcessManager manager) {
         this.manager = manager;
     }
 
     /**
-     * Retrieve a list of abandoned processes
+     * Retrieve status for all processes
      * <p>
-     * curl http://localhost:8080/abandoned
-     * @return collection of abandoned processes' details
+     * curl http://localhost:8080/status
+     * @return collection of processes' details
      */
     @GET
     @Timed
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     @ApiOperation(
-            value = "Return list of abandoned processes' details, identified by correlation ID",
-            notes = "Contains details about failed processes having activities that could not be compensated")
+            value = "Return list of processes' details, identified by correlation ID",
+            notes = "Contains details about processes")
     @ApiResponses(value = {
             @ApiResponse(code = 200 /* OK */, message = "OK"),
             @ApiResponse(code = 598 /* Request failure */, message = "Failed to process request")})
-    public Response getAbandonedProcesses() {
+    public Response getProcessStatus() {
         try {
-            Collection<MuProcessDetails> details = manager.getAbandonedProcessDetails();
+            Collection<MuProcessDetails> details = manager.getProcessDetails();
             return Response.ok(details, MediaType.APPLICATION_JSON_TYPE).build();
 
         } catch (MuProcessException mpe) {
-            String info = "Failed to retrieve abandoned process details: ";
+            String info = "Failed to retrieve process details: ";
             info += mpe.getMessage();
             log.info(info, mpe);
 
@@ -86,51 +87,35 @@ public class AbandonedProcessService {
     /**
      * Remove specified abandoned process (identified by correlation ID).
      * <p>
-     * curl -v -X DELETE http://localhost:8080/abandoned/775113c6-8f7a-4f0d-b5fd-9139727ef224
+     * curl http://localhost:8080/status/775113c6-8f7a-4f0d-b5fd-9139727ef224
      */
-    @DELETE
+    @GET
     @Timed
     @Path("/{correlationId}")
     @ApiOperation(
-            value = "Reset abandoned process, effectively removing all traces of it having occurred",
-            notes = "The provided parameter is used to identify the abandoned process")
+            value = "Return details for process identified by correlation ID",
+            notes = "The provided parameter is used to identify the process")
     @Produces({MediaType.TEXT_PLAIN})
     @ApiResponses(value = {
             @ApiResponse(code = 200 /* OK */, message = "Process reset"),
-            @ApiResponse(code = 412 /* Precondition Failed */, message = "Unknown process or process not abandoned"),
+            @ApiResponse(code = 412 /* Precondition Failed */, message = "Unknown process"),
             @ApiResponse(code = 500 /* Internal Server Error */, message = "Failed to process request"),
             @ApiResponse(code = 598 /* Request failure */, message = "Failed to process request")})
-    public Response resetAbandonedProcess(
+    public Response getProcessStatus(
             @ApiParam(value = "CorrelationId", required = true) @PathParam("correlationId") String correlationId
     ) {
         try {
-            // If process is not abandoned, flag this as an error
-            Optional<MuProcessState> state = manager.getProcessState(correlationId);
-            if (!state.isPresent()) {
+            Optional<MuProcessDetails> details = manager.getProcessDetails(correlationId);
+            if (!details.isPresent()) {
                 String info = String.format("Process (referred to by correlation ID \"%s\") is unknown", correlationId);
                 return Response.status(412).type(MediaType.TEXT_PLAIN_TYPE).entity(info).build();
             }
-            else {
-                if (state.get() != MuProcessState.ABANDONED) {
-                    String info = String.format("Process (referred to by correlation ID \"%s\") exists but is not abandoned", correlationId);
-                    return Response.status(412).type(MediaType.TEXT_PLAIN_TYPE).entity(info).build();
-                }
-            }
 
-            Optional<Boolean> success = manager.resetProcess(correlationId);
-            if (success.isPresent() && success.get()) {
-                return Response.ok("Process reset", MediaType.TEXT_PLAIN_TYPE).build();
-            }
-            else {
-                // Not really interesting, indicating process not found and effectively meaning
-                // the process was reset (by someone else) during the last milliseconds or so,
-                // effectively doing our bidding.
-                // We'll keep this if statement branch for clarity.
-                return Response.ok("Process reset", MediaType.TEXT_PLAIN_TYPE).build();
-            }
+            return Response.ok(details.get(), MediaType.APPLICATION_JSON_TYPE).build();
+
         } catch (MuProcessException mpe) {
             // Reset request failed
-            String info = String.format("Failed to reset process (referred to by correlation ID \"%s\"): %s", correlationId, mpe.getMessage());
+            String info = String.format("Failed to retrieve status for process (referred to by correlation ID \"%s\"): %s", correlationId, mpe.getMessage());
             log.info(info, mpe);
 
             return Response.status(598).type(MediaType.TEXT_PLAIN_TYPE).entity(info).build();
