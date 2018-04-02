@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.gautelis</groupId>
             <artifactId>muprocessmanager</artifactId>
-            <version>1.10-SNAPSHOT</version>
+            <version>1.10</version>
         </dependency>
 
         <!-- HTTP client stuff -->
