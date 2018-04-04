@@ -7,7 +7,7 @@ A generic microprocess that orchestrates calls to a [configurable set](./demo-pr
 
 Client issues a process invocation:
 ```
-➜ curl -v -H "Content-Type:application/json" -d '{"pizzaId":101,"ingredients":["flour","eggs","milk","salt","nasty small chickins"],"pizzaName":"Chichen (P)itza"}' http://localhost:8080/process/demo/775113c6-8f7a-4f0d-b5fd-9139727ef224
+➜ curl -v -H "Content-Type:application/json" -d '{"pizzaId":101,"ingredients":["flour","eggs","milk","salt","nasty little chickins"],"pizzaName":"Chichen (P)itza"}' http://localhost:8080/process/demo/775113c6-8f7a-4f0d-b5fd-9139727ef224
 ```
 
 which is greeted with something akin to:
