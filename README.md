@@ -69,18 +69,20 @@ After the process was dropped:
 *   Trying ::1...
 * TCP_NODELAY set
 * Connected to localhost (::1) port 8080 (#0)
-> GET /invoke/775113c6-8f7a-4f0d-b5fd-9139727ef224 HTTP/1.1
+> GET /process/775113c6-8f7a-4f0d-b5fd-9139727ef224 HTTP/1.1
 > Host: localhost:8080
-> User-Agent: curl/7.58.0
+> User-Agent: curl/7.59.0
 > Accept: */*
 > 
-< HTTP/1.1 200 OK
+< HTTP/1.1 412 Precondition Failed
 < Host: localhost:8080
-< User-Agent: curl/7.58.0
+< User-Agent: curl/7.59.0
 < Accept: */*
 < Connection: keep-alive
-< Content-Length: 0
+< Content-Length: 53
+< Content-Type: text/plain
 < 
 * Connection #0 to host localhost left intact
+Unknown process: 775113c6-8f7a-4f0d-b5fd-9139727ef224
 ```
 

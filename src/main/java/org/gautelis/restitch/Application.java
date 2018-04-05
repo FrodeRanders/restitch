@@ -45,6 +45,8 @@ import static java.lang.Runtime.getRuntime;
 public class Application {
     private final static Logger log = LogManager.getLogger(Application.class);
 
+    private static final int CONFIGURATION_FAILURE_STATUS = 0;
+
     private static final String PROCESS_SPECIFICATION_FILE = "RESTITCH_PROCESS_SPECIFICATION_FILE";
     private static final String MANAGEMENT_POLICY_FILE = "RESTITCH_MANAGEMENT_POLICY_FILE";
     private static final String SQL_STATEMENTS_FILE = "RESTITCH_SQL_STATEMENTS_FILE";
@@ -78,7 +80,7 @@ public class Application {
             System.err.println("---8<---------------------------------------------------------------------------");
             System.err.println(ProcessSpecification.getExample());
             System.err.println("--------------------------------------------------------------------------->8---");
-            System.exit(1);
+            System.exit(CONFIGURATION_FAILURE_STATUS);
         }
 
         // Load SQL statements
@@ -98,7 +100,7 @@ public class Application {
             log.warn(info, e);
 
             System.err.println(info);
-            System.exit(1);
+            System.exit(CONFIGURATION_FAILURE_STATUS);
             return;
         }
 
@@ -119,14 +121,14 @@ public class Application {
             log.warn(info, e);
 
             System.err.println(info);
-            System.exit(1);
+            System.exit(CONFIGURATION_FAILURE_STATUS);
             return;
         }
 
         if (policy.assumeNativeProcessDataFlow()) {
             String info = "Configuration error: Management policy \"assume-native-process-data-flow\" has to be false!";
             System.err.println(info);
-            System.exit(1);
+            System.exit(CONFIGURATION_FAILURE_STATUS);
         }
 
         //
@@ -154,14 +156,14 @@ public class Application {
             String info = "Could not load process specifications: ";
             info += ioe.getMessage();
             System.err.println(info);
-            System.exit(1);
+            System.exit(CONFIGURATION_FAILURE_STATUS);
 
         } catch (Throwable t) {
             String info = "Application failure: ";
             info += t.getMessage();
             System.err.println(info);
             t.printStackTrace(System.err);
-            System.exit(1);
+            System.exit(CONFIGURATION_FAILURE_STATUS);
         }
     }
 
@@ -221,7 +223,7 @@ public class Application {
             log.warn(info, e);
 
             System.err.println(info);
-            System.exit(1);
+            System.exit(CONFIGURATION_FAILURE_STATUS);
         }
         return dataSource;
     }
