@@ -22,6 +22,7 @@ import org.gautelis.muprocessmanager.MuProcessManagementPolicy;
 import org.gautelis.muprocessmanager.MuProcessManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.gautelis.muprocessmanager.MuProcessManagerFactory;
 import org.gautelis.restitch.stubbed.StubbedCompensationService;
 import org.gautelis.restitch.stubbed.StubbedInvocationService;
 import org.gautelis.vopn.db.Database;
@@ -89,9 +90,9 @@ public class Application {
             File statementsFile = configuration.sqlStatements();
             if (null == statementsFile || !statementsFile.exists() || !statementsFile.canRead()) {
                 System.out.println("Using default SQL statements");
-                sqlStatements = MuProcessManager.getDefaultSqlStatements();
+                sqlStatements = MuProcessManagerFactory.getDefaultSqlStatements();
             } else {
-                sqlStatements = MuProcessManager.getSqlStatements(statementsFile);
+                sqlStatements = MuProcessManagerFactory.getSqlStatements(statementsFile);
             }
         }
         catch (FileNotFoundException | MuProcessException e) {
@@ -110,9 +111,9 @@ public class Application {
             File policyFile = configuration.managementPolicy();
             if (null == policyFile || !policyFile.exists() || !policyFile.canRead()) {
                 System.out.println("Using default management policy");
-                policy = MuProcessManager.getManagementPolicy(Application.class, "management-policy.xml");
+                policy = MuProcessManagerFactory.getManagementPolicy(Application.class, "management-policy.xml");
             } else {
-                policy = MuProcessManager.getManagementPolicy(policyFile);
+                policy = MuProcessManagerFactory.getManagementPolicy(policyFile);
             }
         }
         catch (FileNotFoundException | MuProcessException e) {
@@ -133,7 +134,7 @@ public class Application {
 
         //
         DataSource dataSource = getDataSource();
-        MuProcessManager manager = MuProcessManager.getManager(dataSource, sqlStatements, policy);
+        MuProcessManager manager = MuProcessManagerFactory.getManager(dataSource, sqlStatements, policy);
         getRuntime().addShutdownHook(new Thread(manager::stop));
         manager.start();
 
@@ -185,8 +186,8 @@ public class Application {
                 if (null == choice || choice.isEmpty()) {
                     // No database configuration -- fall back on embedded derby
                     System.out.println("Using default backing database");
-                    dataSource = MuProcessManager.getDefaultDataSource("restitch");
-                    MuProcessManager.prepareInternalDatabase(dataSource);
+                    dataSource = MuProcessManagerFactory.getDefaultDataSource("restitch");
+                    MuProcessManagerFactory.prepareInternalDatabase(dataSource);
 
                 } else {
                     // MySQL was chosen
