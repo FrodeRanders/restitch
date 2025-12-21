@@ -40,7 +40,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <httpclient.version>4.5.14</httpclient.version>
     <slf4j.version>1.7.25</slf4j.version>
-    <log4j.version>2.17.1</log4j.version>
+    <log4j.version>2.25.3</log4j.version>
     <swagger.version>1.6.14</swagger.version>
     <msf4j.version>2.8.11</msf4j.version>
     <muprocessmanager.version>2.0-SNAPSHOT</muprocessmanager.version>
